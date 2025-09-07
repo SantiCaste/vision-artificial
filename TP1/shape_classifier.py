@@ -3,13 +3,24 @@ import numpy as np
 
 # Constants
 PARAMS_WINDOW_NAME = "Parametros"
-THRESHOLD_NAME = "Umbral"
-DISTANCE_NAME = "Distancia"
-AREA_NAME = "Area"
+THRESHOLD_NAME = "Umbral" # Threshold for binary image
+DISTANCE_NAME = "Distancia de coincidencia" # Minimum match distance 
+AREA_NAME = "Area" # Minimum area to consider a contour
 
-SQUARE = "square"
-CIRCLE = "circle"
-BOTTLE = "bottle"
+SQUARE = "cuadrado"
+CIRCLE = "círculo"
+TRIANGLE = "triángulo"
+
+RED = (0, 0, 255)
+GREEN = (0, 255, 0)
+BLUE = (255, 0, 0)
+YELLOW = (0, 255, 255)
+
+color_dict = {
+    SQUARE: BLUE,
+    CIRCLE: GREEN,
+    TRIANGLE: YELLOW
+}
 
 # Frame config
 frame_width = 640
@@ -35,13 +46,13 @@ contour_reference = {}
 def get_references(filename: str, figname: str) -> tuple:
     raw_figure = cv2.imread(filename)
     gray_figure = cv2.cvtColor(raw_figure, cv2.COLOR_BGR2GRAY)
-    binary_figure = cv2.threshold(gray_figure, 50, 255, cv2.THRESH_BINARY)[1] # TODO: ver que hace      
+    binary_figure = cv2.threshold(gray_figure, 50, 255, cv2.THRESH_BINARY_INV)[1]
     contours, _ = cv2.findContours(binary_figure, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return contours
 
-contour_reference[SQUARE] = get_references("square_2.png", SQUARE)
-contour_reference[CIRCLE] = get_references("circle_2.png", CIRCLE)
-contour_reference[BOTTLE] = get_references("bottle.jpg", BOTTLE)
+contour_reference[SQUARE] = get_references("square.png", SQUARE)
+contour_reference[CIRCLE] = get_references("circle.jpg", CIRCLE)
+contour_reference[TRIANGLE] = get_references("triangle.jpg", TRIANGLE)
 
 # get image contours
 def get_contours(img, img_contour, min_area=1000):
@@ -56,7 +67,7 @@ def get_contours(img, img_contour, min_area=1000):
 
         perimeter  = cv2.arcLength(count, True)
         approximation = cv2.approxPolyDP(count, 0.02 * perimeter, True)
-        cv2.drawContours(img_contour, contours, i, (0, 255, 0), 3)
+        cv2.drawContours(img_contour, contours, i, GREEN, 3)
 
         x, y, w, h = cv2.boundingRect(approximation)
         x_center = int((2 * x + w) / 2)
@@ -67,8 +78,9 @@ def get_contours(img, img_contour, min_area=1000):
 # Process the image by:
 def process_image(img, threshold, match_dist, min_area):
     # Turn the image to gray scale
-    img_blur = cv2.GaussianBlur(img, (7, 7), 1)
+    img_blur = cv2.GaussianBlur(img, (5, 5), 1)
     img_gray = cv2.cvtColor(img_blur, cv2.COLOR_BGR2GRAY)
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Turn the gray scale image to binary
     img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)[1]
@@ -98,11 +110,11 @@ def process_image(img, threshold, match_dist, min_area):
                     best_dist = dist
                     best_match = shape
 
-        color = (0, 0, 255) # By default, red for no match
+        color = RED # By default, red for no match
         label = "Unknown"
 
         if best_dist < match_dist:
-            color = (0, 255, 0) # Green for an identified match
+            color = color_dict[best_match] # Green for an identified match
             label = best_match
 
         cv2.drawContours(img, [contour], -1, color, 3)
