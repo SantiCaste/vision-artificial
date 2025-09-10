@@ -54,36 +54,15 @@ contour_reference[SQUARE] = get_references("square.png", SQUARE)
 contour_reference[CIRCLE] = get_references("circle.jpg", CIRCLE)
 contour_reference[TRIANGLE] = get_references("triangle.jpg", TRIANGLE)
 
-# get image contours
-def get_contours(img, img_contour, min_area=1000):
-    contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for i, count in enumerate(contours):
-        if i == 0:
-            continue
-
-        area =  cv2.contourArea(count)
-        if area < min_area:
-            continue
-
-        perimeter  = cv2.arcLength(count, True)
-        approximation = cv2.approxPolyDP(count, 0.02 * perimeter, True)
-        cv2.drawContours(img_contour, contours, i, GREEN, 3)
-
-        x, y, w, h = cv2.boundingRect(approximation)
-        x_center = int((2 * x + w) / 2)
-        y_center = int((2 * y + h) / 2)
-        coordinates = (x_center, y_center)
-        color = (0, 0, 0)
-
 # Process the image by:
 def process_image(img, threshold, match_dist, min_area):
     # Turn the image to gray scale
     img_blur = cv2.GaussianBlur(img, (5, 5), 1)
     img_gray = cv2.cvtColor(img_blur, cv2.COLOR_BGR2GRAY)
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Turn the gray scale image to binary
-    img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)[1]
+    img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY_INV)[1]
 
     # Morphological operations
     kernel = np.ones((5, 5), np.uint8)
