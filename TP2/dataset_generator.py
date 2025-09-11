@@ -41,7 +41,7 @@ def process_image(img, threshold, min_area):
     # img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Turn the gray scale image to binary
-    img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)[1]
+    img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY_INV)[1]
 
     # Morphological operations
     kernel = np.ones((5, 5), np.uint8)

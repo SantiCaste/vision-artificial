@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 if __name__ == "__main__":
     # Load dataset and preprocess
     dataset = pd.read_csv(dg.HU_MOMENTS_FILE, header=None)
-
+    
     # Separate features and labels
     y = dataset.iloc[:, 0].values
     X = dataset.iloc[:, 1:].values

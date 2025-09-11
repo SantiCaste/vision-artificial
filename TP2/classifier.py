@@ -11,7 +11,7 @@ def process_image(img, threshold, min_area):
     # img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Turn the gray scale image to binary
-    img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)[1]
+    img_binary = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY_INV)[1]
 
     # Morphological operations
     kernel = np.ones((5, 5), np.uint8)
@@ -43,8 +43,9 @@ def predict_shape(contours, classifier):
     for contour in contours:
         hu_moments = cv2.HuMoments(cv2.moments(contour)).flatten()
         prediction = classifier.predict([hu_moments])
+        print(f"prediction: {prediction}")
         label = prediction[0]
-        print(f"Predicted shape: {label}")
+        # print(f"Predicted shape: {label}")
         color = dg.color_dict.get(label, dg.RED)
         x, y, w, h = cv2.boundingRect(contour)
         cv2.putText(img_processed, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
