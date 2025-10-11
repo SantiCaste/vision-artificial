@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 6
+names: ['Onion', 'Potato', 'Tomato', 'egg','peach', 'pear']
+
+roboflow:
+  workspace: calories
+  project: fruits-and-veg-2-x027v
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/calories/fruits-and-veg-2-x027v/dataset/2
